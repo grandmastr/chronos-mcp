@@ -1,0 +1,24 @@
+{
+  "name": "chronos-mcp",
+  "version": "1.0.2",
+  "description": "Chronos – A Stellar MCP server",
+  "main": "build/index.js",
+  "bin": {
+    "chronos": "build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grandmastr/chronos-mcp.git"
+  },
+  "scripts": {
+    "build": "tsc && chmod +x build/index.js",
+    "start": "node build/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "@stellar/stellar-sdk": "^10.0.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
