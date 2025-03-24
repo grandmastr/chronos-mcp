@@ -1,6 +1,6 @@
 {
   "name": "chronos-mcp",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Chronos – A Stellar MCP server",
   "main": "build/index.js",
   "bin": {
