@@ -8,14 +8,13 @@ import {
   McpError,
 } from '@modelcontextprotocol/sdk/types.js';
 import * as stellar from '@stellar/stellar-sdk';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 // Initialize Stellar SDK (using testnet by default)
 const stellarServer = new stellar.Horizon.Server('https://horizon.stellar.org');
 const networkPassphrase = stellar.Networks.PUBLIC;
-
-interface WalletConnectionArgs {
-  secretKey: string;
-}
+const secretKey = process.env.STELLAR_SECRET_KEY;
 
 interface TokenListArgs {
   publicKey: string;
@@ -54,7 +53,7 @@ class StellarMcpServer {
 
     this.setupToolHandlers();
 
-    this.server.onerror = (error) => console.error('[MCP Error]', error);
+    this.server.onerror = error => console.error('[MCP Error]', error);
     process.on('SIGINT', async () => {
       await this.server.close();
       process.exit(0);
@@ -135,15 +134,17 @@ class StellarMcpServer {
       ],
     }));
 
-    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+    this.server.setRequestHandler(CallToolRequestSchema, async request => {
       const args = request.params.arguments as Record<string, unknown>;
+      const secretKey = process.env.STELLAR_SECRET_KEY;
 
       switch (request.params.name) {
         case 'connect_wallet': {
-          if (!(args && typeof args.secretKey === 'string')) {
+          if (!secretKey) {
             throw new McpError(ErrorCode.InvalidParams, 'Secret key is required');
           }
-          return await this.handleConnectWallet({ secretKey: args.secretKey });
+
+          return await this.handleConnectWallet();
         }
         case 'list_tokens': {
           if (!(args && typeof args.publicKey === 'string')) {
@@ -158,8 +159,11 @@ class StellarMcpServer {
           return await this.handleGetBalances({ publicKey: args.publicKey });
         }
         case 'transfer_funds': {
+          if (!secretKey) {
+            throw new McpError(ErrorCode.InvalidParams, 'Secret key is required');
+          }
+
           if (
-            !(args && typeof args.secretKey === 'string') ||
             !(args && typeof args.destinationAddress === 'string') ||
             !(args && typeof args.amount === 'string')
           ) {
@@ -169,24 +173,33 @@ class StellarMcpServer {
             );
           }
           return await this.handleTransferFunds({
-            secretKey: args.secretKey,
+            secretKey,
             destinationAddress: args.destinationAddress,
             amount: args.amount,
             asset: typeof args.asset === 'string' ? args.asset : undefined,
           });
         }
         default:
-          throw new McpError(
-            ErrorCode.MethodNotFound,
-            `Unknown tool: ${request.params.name}`
-          );
+          throw new McpError(ErrorCode.MethodNotFound, `Unknown tool: ${request.params.name}`);
       }
     });
   }
 
-  private async handleConnectWallet(args: WalletConnectionArgs) {
+  private async handleConnectWallet() {
     try {
-      const keypair = stellar.Keypair.fromSecret(args.secretKey);
+      if (!secretKey) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'No secret key provided',
+            },
+          ],
+          isError: true,
+        };
+      }
+
+      const keypair = stellar.Keypair.fromSecret(secretKey);
       const publicKey = keypair.publicKey();
 
       // Verify the account exists
@@ -248,9 +261,7 @@ class StellarMcpServer {
   private async handleListTokens(args: TokenListArgs) {
     try {
       const account = await stellarServer.loadAccount(args.publicKey);
-      const tokens = (account.balances as Balance[]).map(
-        (balance) => this.getAssetInfo(balance)
-      );
+      const tokens = (account.balances as Balance[]).map(balance => this.getAssetInfo(balance));
 
       return {
         content: [
@@ -285,7 +296,7 @@ class StellarMcpServer {
   private async handleGetBalances(args: TokenListArgs) {
     try {
       const account = await stellarServer.loadAccount(args.publicKey);
-      const balances = (account.balances as Balance[]).map((balance) => ({
+      const balances = (account.balances as Balance[]).map(balance => ({
         ...this.getAssetInfo(balance),
         balance: balance.balance,
       }));
@@ -322,7 +333,19 @@ class StellarMcpServer {
 
   private async handleTransferFunds(args: TransferFundsArgs) {
     try {
-      const sourceKeypair = stellar.Keypair.fromSecret(args.secretKey);
+      const secretKey = process.env.STELLAR_SECRET_KEY;
+      if (!secretKey) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: 'No secret key provided',
+            },
+          ],
+          isError: true,
+        };
+      }
+      const sourceKeypair = stellar.Keypair.fromSecret(secretKey);
       const sourcePublicKey = sourceKeypair.publicKey();
 
       // Load source account
@@ -337,9 +360,7 @@ class StellarMcpServer {
         .addOperation(
           stellar.Operation.payment({
             destination: args.destinationAddress,
-            asset: args.asset
-              ? new stellar.Asset(args.asset)
-              : stellar.Asset.native(),
+            asset: args.asset ? new stellar.Asset(args.asset) : stellar.Asset.native(),
             amount: args.amount,
           })
         )

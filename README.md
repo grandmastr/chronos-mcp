@@ -127,6 +127,7 @@ Sample configuration for Claude Desktop:
 
 ```json
 {
+<<<<<<< HEAD
   "mcpServers": {
     "stellar": {
       "command": "npx",
@@ -155,8 +156,22 @@ For Docker integration with Claude Desktop, you can use:
       },
       "disabled": false,
       "autoApprove": []
+=======
+    "mcpServers": {
+        "stellar": {
+            "command": "npx",
+            "args": [
+                "chronos-mcp@latest"
+            ],
+            "env": {
+                "STELLAR_NETWORK": "mainnet",
+                "STELLAR_SECRET_KEY": "XXXX"
+            },
+            "disabled": false,
+            "autoApprove": []
+        }
+>>>>>>> b2501026b3b5ef4c512fceaf340f53b5102a57f9
     }
-  }
 }
 ```
 

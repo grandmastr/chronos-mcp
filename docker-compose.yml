@@ -1,0 +1,25 @@
+version: '3'
+
+services:
+  chronos-mcp:
+    build: .
+    image: chronos-mcp
+    env_file:
+      - .env
+    container_name: chronos-mcp
+    environment:
+      - NODE_ENV=production
+      # Uncomment and set your Stellar secret key if needed
+      # - STELLAR_SECRET_KEY=your_secret_key
+    stdin_open: true  # Required for stdio communication
+    tty: true         # Allocate a pseudo-TTY
+    restart: unless-stopped
+    # Uncomment to use a volume for persistent data if needed
+    # volumes:
+    #   - ./data:/app/data
+    networks:
+      - chronos-network
+
+networks:
+  chronos-network:
+    driver: bridge
