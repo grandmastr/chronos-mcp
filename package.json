@@ -3,6 +3,7 @@
   "version": "1.0.4",
   "description": "Chronos – A Stellar MCP server",
   "main": "build/index.js",
+  "type": "module",
   "bin": {
     "chronos": "build/index.js"
   },
@@ -16,9 +17,15 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.0",
-    "@stellar/stellar-sdk": "^10.0.0"
+    "@stellar/stellar-sdk": "^13.3.0",
+    "dotenv": "^16.5.0",
+    "typescript": "^5.8.3"
   },
   "engines": {
     "node": ">=14.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.17",
+    "prettier": "^3.5.3"
   }
 }
