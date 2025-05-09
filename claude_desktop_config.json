@@ -1,0 +1,16 @@
+{
+    "mcpServers": {
+        "Chronos": {
+            "command": "node",
+            "args": [
+                "/Users/thegrandmaster/vault/blockchain/chronos-mcp/build/index.js"
+            ],
+            "env": {
+                "STELLAR_NETWORK": "mainnet",
+                "STELLAR_SECRET_KEY": "SAUU2MELTQ4Z45ZN5WXQED7KBI5U6RE4VHMLTULBZNZNO64RNTXEDVVQ"
+            },
+            "disabled": false,
+            "autoApprove": []
+        }
+    }
+}

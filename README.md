@@ -73,6 +73,26 @@ npx chronos-mcp@latest
    npm link
    ```
 
+### Option 3: Using Docker
+
+You can also run Chronos MCP using Docker:
+
+1. Build the Docker image:
+
+   ```bash
+   docker build -t chronos-mcp .
+   ```
+
+2. Run the container:
+
+   ```bash
+   docker run -it --rm chronos-mcp
+   ```
+
+For more detailed instructions on using Docker with Chronos MCP, including Docker Compose setup and integration with Claude Desktop, see the [Docker Usage Guide](docker-usage.md).
+
+To test if your Docker setup works locally, follow the step-by-step instructions in the [Docker Testing Guide](docker-testing-guide.md). This guide includes instructions for building the Docker image, running the container, and testing its functionality.
+
 ## Configuration
 
 Create a configuration file or set environment variables as needed. For example, to use Chronos with Claude Desktop, update your Claude Desktop configuration file located at:
@@ -85,17 +105,20 @@ Sample configuration for Claude Desktop:
 
 ```json
 {
-  "mcpServers": {
-    "stellar": {
-      "command": "npx",
-      "args": ["chronos-mcp@latest"],
-      "env": {
-        "STELLAR_NETWORK": "mainnet"
-      },
-      "disabled": false,
-      "autoApprove": []
+    "mcpServers": {
+        "stellar": {
+            "command": "npx",
+            "args": [
+                "chronos-mcp@latest"
+            ],
+            "env": {
+                "STELLAR_NETWORK": "mainnet",
+                "STELLAR_SECRET_KEY": "XXXX"
+            },
+            "disabled": false,
+            "autoApprove": []
+        }
     }
-  }
 }
 ```
 
