@@ -73,9 +73,51 @@ npx chronos-mcp@latest
    npm link
    ```
 
+### Option 3: Using Docker
+
+You can also run Chronos MCP using Docker:
+
+1. Build the Docker image:
+
+   ```bash
+   docker build -t chronos-mcp .
+   ```
+
+2. Run the container:
+
+   ```bash
+   docker run -it --rm chronos-mcp
+   ```
+
+For more detailed instructions on using Docker with Chronos MCP, including Docker Compose setup and integration with Claude Desktop, see the [Docker Usage Guide](docker-usage.md).
+
+To test if your Docker setup works locally, follow the step-by-step instructions in the [Docker Testing Guide](docker-testing-guide.md). This guide includes instructions for building the Docker image, running the container, and testing its functionality.
+
 ## Configuration
 
-Create a configuration file or set environment variables as needed. For example, to use Chronos with Claude Desktop, update your Claude Desktop configuration file located at:
+### Environment Variables
+
+Chronos MCP uses environment variables for configuration, particularly for sensitive information like your Stellar secret key. The project uses `dotenv` to load environment variables from a `.env` file during development.
+
+To configure environment variables:
+
+1. Create a `.env` file in the project root:
+
+   ```
+   STELLAR_SECRET_KEY=your_stellar_secret_key
+   STELLAR_NETWORK=mainnet
+   ```
+
+2. These variables will be automatically loaded when the application starts.
+
+When using Docker, you can provide environment variables in several ways:
+- Using the `--env-file` flag: `docker run -it --rm --env-file .env chronos-mcp`
+- Using the `env_file` directive in docker-compose.yml
+- Setting individual variables with the `-e` flag: `docker run -it --rm -e STELLAR_SECRET_KEY=your_key chronos-mcp`
+
+### Claude Desktop Configuration
+
+To use Chronos with Claude Desktop, update your Claude Desktop configuration file located at:
 
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
@@ -89,6 +131,25 @@ Sample configuration for Claude Desktop:
     "stellar": {
       "command": "npx",
       "args": ["chronos-mcp@latest"],
+      "env": {
+        "STELLAR_NETWORK": "mainnet",
+        "STELLAR_SECRET_KEY": "your_stellar_secret_key"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}
+```
+
+For Docker integration with Claude Desktop, you can use:
+
+```json
+{
+  "mcpServers": {
+    "stellar": {
+      "command": "docker",
+      "args": ["run", "-i", "--rm", "--env-file", "/path/to/your/.env", "chronos-mcp"],
       "env": {
         "STELLAR_NETWORK": "mainnet"
       },
@@ -145,13 +206,32 @@ Transfers funds from your wallet to another Stellar wallet.
 
 ## Testing
 
+### Standard Testing
+
 To test Chronos MCP locally:
 
 ```bash
 npm test
 ```
 
-This will run the project’s test suite and verify that your server is working as expected.
+This will run the project's test suite and verify that your server is working as expected.
+
+### Docker Testing
+
+To test the Docker setup locally, refer to the [Docker Testing Guide](docker-testing-guide.md) for detailed instructions. The guide covers:
+
+- Building the Docker image
+- Running the container with Docker Compose
+- Testing the container functionality
+- Troubleshooting common issues
+
+You can also use the included `test-client.js` script to test the Docker container:
+
+```bash
+node test-client.js
+```
+
+This script sends a simple MCP request to the Docker container and displays the response.
 
 ## Deployment
 
