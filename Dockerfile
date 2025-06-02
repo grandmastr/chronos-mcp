@@ -1,47 +1,15 @@
-FROM node:20-alpine AS build
+FROM debian:bullseye-slim
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    GLAMA_VERSION="0.2.0" \
+    PATH="/home/service-user/.local/bin:${PATH}"
+
+RUN (groupadd -r service-user) && (useradd -u 1987 -r -m -g service-user service-user) && (mkdir -p /home/service-user/.local/bin /app) && (chown -R service-user:service-user /home/service-user /app) && (apt-get update) && (apt-get install -y --no-install-recommends build-essential curl wget software-properties-common libssl-dev zlib1g-dev git) && (rm -rf /var/lib/apt/lists/*) && (curl -fsSL https://deb.nodesource.com/setup_22.x | bash -) && (apt-get install -y nodejs) && (apt-get clean) && (npm install -g mcp-proxy@3.0.3) && (npm install -g pnpm@9.15.5) && (npm install -g bun@1.1.42) && (node --version) && (curl -LsSf https://astral.sh/uv/install.sh | UV_INSTALL_DIR="/usr/local/bin" sh) && (uv python install 3.13 --default --preview) && (ln -s $(uv python find) /usr/local/bin/python) && (python --version) && (apt-get clean) && (rm -rf /var/lib/apt/lists/*) && (rm -rf /tmp/*) && (rm -rf /var/tmp/*) && (su - service-user -c "uv python install 3.13 --default --preview && python --version")
+
+USER service-user
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json ./
-COPY tsconfig.json ./
+RUN git clone https://github.com/grandmastr/chronos-mcp . && git checkout f340a4d3ed832f48389d81562496daa5af55f236
 
-# Install dependencies
-RUN npm install
-
-# Copy source code
-COPY src/ ./src/
-
-# Build the application
-RUN npm run build
-
-# Production stage
-FROM node:20-alpine
-
-# Create app directory and non-root user
-WORKDIR /app
-RUN addgroup -S chronos && adduser -S -G chronos chronos
-
-# Copy package files and install production dependencies
-COPY package.json ./
-RUN npm install --production && \
-    npm cache clean --force
-
-# Copy built application from build stage
-COPY --from=build /app/build ./build
-
-# Set executable permissions
-RUN chmod +x ./build/index.js && \
-    chown -R chronos:chronos /app
-
-# Set environment variables
-ENV NODE_ENV=production
-
-# Switch to non-root user
-USER chronos
-
-# Handle signals properly
-ENV NODE_OPTIONS="--unhandled-rejections=strict"
-
-# Run the application
-CMD ["node", "build/index.js"]
+CMD ["mcp-proxy"]
