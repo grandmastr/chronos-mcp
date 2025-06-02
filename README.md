@@ -91,7 +91,7 @@ You can also run Chronos MCP using Docker:
 
 For more detailed instructions on using Docker with Chronos MCP, including Docker Compose setup and integration with Claude Desktop, see the [Docker Usage Guide](docker-usage.md).
 
-To test if your Docker setup works locally, follow the step-by-step instructions in the [Docker Testing Guide](docker-testing-guide.md). This guide includes instructions for building the Docker image, running the container, and testing its functionality.
+For information on testing your Docker setup locally, refer to the [Docker Usage Guide](docker-usage.md). This includes information about building the Docker image, running the container, and using Docker with Chronos MCP.
 
 ## Configuration
 
@@ -127,7 +127,6 @@ Sample configuration for Claude Desktop:
 
 ```json
 {
-<<<<<<< HEAD
   "mcpServers": {
     "stellar": {
       "command": "npx",
@@ -156,22 +155,8 @@ For Docker integration with Claude Desktop, you can use:
       },
       "disabled": false,
       "autoApprove": []
-=======
-    "mcpServers": {
-        "stellar": {
-            "command": "npx",
-            "args": [
-                "chronos-mcp@latest"
-            ],
-            "env": {
-                "STELLAR_NETWORK": "mainnet",
-                "STELLAR_SECRET_KEY": "XXXX"
-            },
-            "disabled": false,
-            "autoApprove": []
-        }
->>>>>>> b2501026b3b5ef4c512fceaf340f53b5102a57f9
     }
+  }
 }
 ```
 
@@ -233,12 +218,12 @@ This will run the project's test suite and verify that your server is working as
 
 ### Docker Testing
 
-To test the Docker setup locally, refer to the [Docker Testing Guide](docker-testing-guide.md) for detailed instructions. The guide covers:
+To test the Docker setup locally, refer to the [Docker Usage Guide](docker-usage.md) for instructions. The guide covers:
 
 - Building the Docker image
 - Running the container with Docker Compose
-- Testing the container functionality
-- Troubleshooting common issues
+- Integration with Claude Desktop
+- Other Docker-related information
 
 You can also use the included `test-client.js` script to test the Docker container:
 
