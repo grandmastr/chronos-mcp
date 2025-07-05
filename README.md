@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/grandmastr-chronos-mcp-badge.png)](https://mseep.ai/app/grandmastr-chronos-mcp)
+
 # Chronos MCP Server 🔵
 
 [![npm version](https://img.shields.io/npm/v/chronos-mcp.svg)](https://www.npmjs.com/package/chronos-mcp)
